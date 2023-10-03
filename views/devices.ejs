@@ -1,0 +1,143 @@
+<%- include("partials/header"); %>
+
+<div class="main d-flex flex-column justify-content-center px-5">
+  <!-- DEVICES TABLE -->
+  <div class="h-100 overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span>ID</span>
+          </th>
+          <th scope="col">
+            <span>Device Type</span>
+          </th>
+          <th scope="col">
+            <span>Device Status</span>
+          </th>
+          <th style="text-align: end" scope="col">
+            <span>Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% devicesTypes.forEach(type => { %>
+          <% for( let index = 0; index < devices[type].length; index++ ) { %>
+            <% const deviceType = devices[type][index].deviceType; %>
+            <% const deviceStatus = devices[type][index].deviceStatus; %>
+            <% const deviceId = devices[type][index]._id %>
+            <tr>
+              <th scope="row">
+                <span><%= index + 1 %></span>
+              </th>
+              <td>
+                <span><%= deviceType %></span>
+              </td>
+              <td>
+                <span><%= deviceStatus %></span>
+              </td>
+              <td style="text-align: end">
+                <div class="dropdown">
+                  <button
+                    class="btn btn-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <i class="fa-solid fa-gear"></i>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">  
+                    <a class="dropdown-item" href="/deleteDevice?deviceId=<%=deviceId%>">Delete Device</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% } %>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <td style="border: none">
+          <button
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#addDeviceModal"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </td>
+      </tfoot>
+    </table>
+  </div>
+  <!-- ADD DEVICE TAB -->
+  <div
+  class="modal fade"
+  id="addDeviceModal"
+  tabindex="-1"
+  aria-labelledby="addDeviceModal"
+  aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addDeviceModalLabel">Add Device</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <form action="/addDevice" id="addDeviceForm" method="post">
+            <div class="mb-4">
+              <label class="form-label" for="addDeviceType">Device Type</label>
+              <input
+                id="addDeviceType"
+                class="form-control" 
+                list="deviceTypeOptions" 
+                placeholder="Add Or Search..."
+                name="deviceType"
+                autocomplete="off"
+                required
+              >
+                <datalist id="deviceTypeOptions">
+                <% devicesTypes.forEach(type => { %>
+                  <option><%=type[0].toUpperCase() + type.substring(1)%></option>
+                <% }) %>
+              </datalist>
+            </div>
+
+            <label for="addDeviceStatus">Device Status</label>
+            <select
+              class="form-select my-2"
+              name="deviceStatus"
+              id="addDeviceStatus"
+            >
+              <option value="normal">Normal</option>
+              <option value="vip">VIP</option>
+            </select>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            form="addDeviceForm"
+            class="btn btn-success"
+            data-bs-dismiss="modal"
+          >
+            Add Device
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer"); %>

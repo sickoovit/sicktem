@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JQUERY -->
+        <script src ="jquery.min.js"></script>
+
+        <!-- MDB -->
+        <link
+            href="mdb.min.css"
+            rel="stylesheet"
+        />
+
+        <!-- Local Styles -->
+        <link rel="stylesheet" href="css/login.css" />
+
+        <!-- FAVICON -->
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+
+        <title>See | Login</title>
+    </head>
+    <body>
+        <section class="vh-100 gradient-custom">
+            <div class="container py-5 h-100">
+                <div
+                    class="row d-flex justify-content-center align-items-center h-100"
+                >
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                        <div
+                            class="card bg-card-custom text-white"
+                            style="border-radius: 1rem"
+                        >
+                            <div class="card-body p-5 text-center">
+                                <div class="mb-md-5 pb-2 mx-4">
+                                    <div class="mb-6">
+                                        <img
+                                            src="images/logo.png"
+                                            class="img-fluid"
+                                            alt="Brand Logo"
+                                        />
+                                    </div>
+                                    <% if ( alertMsg ) { %>
+                                    <div class="gradient-custom rounded mb-4 p-2">
+                                        <%=alertMsg%>
+                                    </div>
+                                    <% } %>
+                                    <form action="/login" method="post">
+                                        <div class="form-outline mb-4">
+                                            <input autofocus
+                                                type="username"
+                                                id="typeEmailX"
+                                                class="form-control form-control-lg"
+                                                name="username"
+                                            />
+                                            <label
+                                                class="form-label"
+                                                for="typeEmailX"
+                                                >Username</label
+                                            >
+                                        </div>
+
+                                        <div class="form-outline mb-6">
+                                            <input
+                                                type="password"
+                                                id="typePasswordX"
+                                                class="form-control form-control-lg"
+                                                name="password"
+                                            />
+                                            <label
+                                                class="form-label"
+                                                for="typePasswordX"
+                                                >Password</label
+                                            >
+                                        </div>
+
+                                        <button
+                                            class="btn btn-outline-dark btn-lg px-5"
+                                            type="submit"
+                                        >
+                                            Login
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MDB -->
+        <script
+            type="text/javascript"
+            src="mdb.min.js"
+        ></script>
+        
+    </body>
+</html>

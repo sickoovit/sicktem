@@ -1,0 +1,75 @@
+/* NAVS */
+.custom-nav-link,
+.custom-nav-link:hover {
+  color: #ffffff;
+}
+
+.custom-nav-link {
+  padding: 20px;
+}
+
+.custom-nav-link:hover {
+  background-color: #1a1c20;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: white;
+  background-color: #c51e2f;
+}
+
+/* CARDS */
+.card-container {
+  padding-inline: 1rem;
+}
+
+.card-normal {
+  background-color: #101114;
+  padding-block-end: 2%;
+  border: none;
+}
+
+.card-vip {
+  background-color: #cc9933;
+  padding-block-end: 2%;
+  border: none;
+}
+
+.card-text {
+  font-size: 100px;
+  text-align: center;
+}
+
+.card-text-idle {
+  color: #adb5bd;
+}
+
+.card-text-vip {
+  color: black;
+}
+
+.card-text-active {
+  color: rgb(0, 94, 0);
+}
+
+/* STATUS BAR */
+.status-bar {
+  height: 0.4em;
+  width: 60%;
+  align-self: center;
+  position: relative;
+  bottom: 10px;
+  border: none;
+}
+
+.status-bar-idle {
+  background-color: #adb5bd;
+}
+
+.status-bar-vip {
+  background-color: black;
+}
+
+.status-bar-active {
+  background-color: rgb(0, 94, 0);
+}

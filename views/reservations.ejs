@@ -1,0 +1,366 @@
+<%- include("partials/header"); %>
+
+<div class="main d-flex flex-column justify-content-center px-5">
+  <% if ( alertMsg ) { %>
+  <div
+    class="alert alert-danger rounded mb-4 p-2"
+    style="width: auto"
+    role="alert"
+  >
+    <%=alertMsg%>
+  </div>
+  <% } %>
+  <!-- RESERVATIONS TABLE -->
+  <div class="h-100 overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span>Client Name</span>
+          </th>
+          <th scope="col">
+            <span>Phone Number</span>
+          </th>
+          <th scope="col">
+            <span>Device Type</span>
+          </th>
+          <th scope="col">
+            <span>Device Name</span>
+          </th>
+          <th scope="col">
+            <span>Single Or Multi</span>
+          </th>
+          <th scope="col">
+            <span>Start Time</span>
+          </th>
+          <th scope="col">
+            <span>End Time</span>
+          </th>
+          <th style="text-align: end" scope="col">
+            <span>Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reservations.forEach((reservation) => { %>
+        <tr>
+          <td> 
+            <span><%= reservation.client.name %></span>
+          </td>
+          <td> 
+            <span><%= reservation.client.phoneNumber %></span>
+          </td>
+          <td> 
+            <span><%= reservation.device.deviceType %></span>
+          </td>
+          <td>
+            <span><%= reservation.deviceName %></span>
+          </td>
+          <td>
+            <span>
+              <%=reservation.singleOrMulti%>
+            </span>
+          </td>
+          <td>
+            <span><%= reservation.startTime.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }) %></span>
+          </td>
+          <td>
+            <span>
+              <% if (reservation.endTime.getTime() == reservation.startTime.getTime()) { %>
+                Open
+              <% } else{ %>
+                <%= reservation.endTime.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }) %>
+              <% } %>
+            </span>
+          </td>
+          <th style="text-align: end">
+            <div class="dropdown">
+              <button
+                class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fa-solid fa-user-gear"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a
+                  type="button"
+                  class="dropdown-item"
+                  href="/deleteReservation?reservationId=<%= reservation._id %>"
+                  >Delete Reservation</a
+                >
+              </div>
+            </div>
+          </th>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <td style="border: none">
+          <button
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#addReservationModal"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </td>
+      </tfoot>
+    </table>
+  </div>
+  <!-- ADD RESERVATION TAB -->
+  <div
+  class="modal fade"
+  id="addReservationModal"
+  tabindex="-1"
+  aria-labelledby="addReservationModal"
+  aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addReservationModalLabel">New Reservation</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- ADD RESERVATION FORM -->
+          <form action="/addReservation" id="addReservationForm" method="post">
+            <div class="row row-cols-2">
+              <div class="col border-end">
+                <!-- INPUT CLIENT NAME -->
+                <div class="mb-4">
+                  <label class="form-label" for="addReservationClientName">Client Name</label>
+                  <input
+                    id="addReservationClientName"
+                    class="form-control" 
+                    list="clientNameOptions" 
+                    placeholder="Add Or Search..."
+                    name="clientName"
+                    autocomplete="off"
+                    required
+                  >
+                  <datalist id="clientNameOptions">
+                    <% clients.forEach(client => { %>
+                    <option data-client="<%= JSON.stringify(client) %>" value="<%=client.name%>"><%=client.phoneNumber%></option>
+                    <% }) %>
+                  </datalist>
+                </div>
+                <!-- INPUT CLIENT PHONE NUMBER -->
+                <div class="mb-4">
+                  <label class="form-label" for="addReservationPhoneNumber">Phone Number</label>
+                  <input
+                    id="addReservationPhoneNumber"
+                    class="form-control"
+                    list="clientPhoneNumberOptions"
+                    placeholder="Add Or Search..."
+                    name="clientPhoneNumber" 
+                    autocomplete="off"
+                    maxlength="13"
+                    required
+                  />
+                  <datalist id="clientPhoneNumberOptions">
+                    <% clients.forEach(client => { %>
+                    <option value="<%=client.phoneNumber%>"><%=client.name%></option>
+                    <% }) %>
+                  </datalist>
+                </div>
+                <hr class="hr"/>
+                <!-- SET STARTING TIME -->
+                <div class="mb-4">
+                  <label class="form-label" for="inputStartingDate">Starting Date</label>
+                  <input
+                    class="form-control"
+                    type="datetime-local"
+                    id="inputStartingDate"
+                    name="reservationStartingTime"
+                    required
+                  />
+                </div>
+                <!-- SET HOURS -->
+                <div class="mb-4">
+                  <!-- HOURS SET SWITCH -->
+                  <div class="d-inline-flex">              
+                    <label 
+                      class="form-check-label"  
+                      for="hoursSwitch"
+                      >Hours</label
+                    >
+                    <div class="form-check form-switch mx-2">
+                      <input
+                        checked
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="hoursSwitch"
+                        onclick="hideInput('inputHours')"
+                      />
+                      <label
+                        class="form-check-label"
+                        for="hoursSwitch"
+                        >Open</label
+                      >
+                    </div>
+                  </div>
+                  <!-- HOURS SET INPUT -->
+                  <input
+                    class="form-control my-2 invisible"
+                    type="number"
+                    min="0"
+                    placeholder="Number of hours"
+                    id="inputHours"
+                    name="reservationDuration"
+                    value="0"
+                  />
+                </div>
+              </div>
+              <div class="col">
+                <!-- SELECT DEVICE TYPE -->
+                <div class="mb-4">
+                  <label class="form-label" for="selectDeviceType">Device Type</label>
+                  <select 
+                    class="form-select mb-2" 
+                    name="deviceType"
+                    id="selectDeviceType"
+                  >
+                  <option id="defaultDeviceType" selected>Select Device</option>
+                    <% devicesTypes.forEach(type => { %>
+                      <option value="<%=type.replace(/\s+/g, '-').toLowerCase();%>"><%= type %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <!-- SELECT DEVICE ID -->
+                <div class="mb-4">
+                  <label class="form-label" for="selectDeviceId">Device ID</label>
+                  <select 
+                    class="form-select mb-2"
+                    name="deviceId"
+                    id="selectDeviceId"
+                  >
+                    <option id="defaultDeviceId" selected>Select ID</option>
+                    <% devicesTypes.forEach(type => { %>
+                      <optgroup id="<%=type.replace(/\s+/g, '-').toLowerCase();%>" label="<%=type%>">
+                        <% for( let index = 0; index < devices[type].length; index++ ) { %>
+                          <option data-device="<%= JSON.stringify(devices[type][index]) %>" value="<%= index %>"><%= index + 1 %></option>
+                        <% } %>
+                      </optgroup>
+                    <% }) %>
+                  </select>
+                </div>
+                <hr class="hr"/>
+                <!-- SINGLE || MULTI -->
+                <div class="mb-4">
+                  <label class="form-label" for="singleOrMultiSelect">Single || Multi</label>
+                    <select
+                      class="form-select mb-2"
+                      id="singleOrMultiSelect"
+                      name="singleOrMulti"
+                    >
+                    <option selected value="Single">Single</option>
+                    <option value="Multi">Multi</option>
+                    </select>
+                </div> 
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            form="addReservationForm"
+            class="btn btn-success"
+          >
+            Add Reservation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div>
+
+<script src="/jquery.redirect.js"></script>
+
+<script>
+  function hideInput(inputToHide) {
+    var inputField = $(`#${inputToHide}`);
+    inputField.toggleClass('invisible');
+  }
+
+  $("#addReservationClientName").on('input', function () {
+    const val = this.value;
+    const option = $('#clientNameOptions option').filter(function(){
+        return this.value.toUpperCase() === val.toUpperCase();        
+    });
+    if(option.length){
+      const client = JSON.parse(option.attr("data-client"));
+      $("#addReservationPhoneNumber").val(client.phoneNumber);
+      $("#addReservationPhoneNumber").prop( "disabled", true );
+    }else{
+      $("#addReservationPhoneNumber").val("")
+      $("#addReservationPhoneNumber").prop( "disabled", false );
+    }
+  });
+
+  $(document).ready(function (){
+    $(`#selectDeviceId optgroup`).hide();
+  })
+
+  $("#selectDeviceType").on('change', function (){
+    const val = this.value;
+    $("#selectDeviceId optgroup").hide();
+    $("#defaultDeviceType").hide();
+    $("#defaultDeviceId").hide();
+    $(`#selectDeviceId #${val}`).show();
+  })
+
+  $("#addReservationForm").submit(function( event ) {
+    event.preventDefault();
+    var url = $(this).attr( "action" );
+    var arrPostData = $(this).serializeArray();
+    var objPostData = {};
+    arrPostData.forEach(pieceOfData => {
+      objPostData[pieceOfData.name] = pieceOfData.value;
+    });
+
+    const nameOption = $('#clientNameOptions option').filter(function(){
+        const val = this.value;
+        return $("#addReservationClientName").val().toUpperCase() === val.toUpperCase();        
+    });
+    var client;
+    if(nameOption.length){
+      client = nameOption.attr("data-client");
+    }else{
+      client = null;
+    }
+
+    const deviceOption = $(`optgroup#${objPostData['deviceType']} option`).filter(function(){
+        const val = this.value;
+        return objPostData['deviceId'] == val;        
+    });
+    var device;
+    if(deviceOption.length){
+      device = deviceOption.attr("data-device");
+    }else{
+      device = null;
+    }
+    
+    objPostData.clientObj = client;
+    objPostData.deviceObj = device;
+    $.redirect(url, objPostData, "POST");
+});
+
+</script>
+
+<%- include("partials/footer"); %>

@@ -1,0 +1,321 @@
+<%- include("partials/header"); %>
+
+<!--MAIN CONTAINER-->
+
+<div class="main d-flex flex-column justify-content-center px-5">
+  <% if ( alertMsg ) { %>
+  <div
+    class="alert alert-danger rounded mb-4 p-2"
+    style="width: auto"
+    role="alert"
+  >
+    <%=alertMsg%>
+  </div>
+  <% } %>
+  <!-- USERS TABLE -->
+  <div class="h-100 overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span>ID</span>
+          </th>
+          <th scope="col">
+            <span>Username</span>
+          </th>
+          <th scope="col">
+            <span>Password</span>
+          </th>
+          <th scope="col">
+            <span>User Type</span>
+          </th>
+          <th style="text-align: end" scope="col">
+            <span>Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user) => { %>
+        <tr>
+          <th scope="row">
+            <span><%= user.id %></span>
+          </th>
+          <td>
+            <span><%= user.username %></span>
+          </td>
+          <td>
+            <span><%= user.password %></span>
+          </td>
+          <td><span><%= user.user_type %></span></td>
+          <th style="text-align: end">
+            <div class="dropdown">
+              <button
+                class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fa-solid fa-user-gear"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/deleteUser?id=<%= user.id %>"
+                  >Delete User</a
+                >
+                <a
+                  type="button"
+                  class="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#change-password-user-<%= user.id %>-modal"
+                  >Change Password</a
+                >
+
+                <a
+                  type="button"
+                  class="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#change-type-user-<%= user.id %>-modal"
+                  >Change User Type</a
+                >
+              </div>
+            </div>
+          </th>
+        </tr>
+
+        <!-- CHANGE PASSWORD TAB -->
+        <div
+          class="modal fade"
+          id="change-password-user-<%= user.id %>-modal"
+          tabindex="-1"
+          aria-labelledby="change-password-user-<%= user.id %>-modal"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5
+                  class="modal-title"
+                  id="change-password-user-<%= user.id %>-modal"
+                >
+                  Change Password
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <label class="p-2 fs-5">Username: <%= user.username %></label
+                ><br />
+                <label class="p-2 fs-5"
+                  >Old Password: <%= user.password %></label
+                >
+                <hr />
+
+                <!-- NEW PASSWORD FORM -->
+                <form
+                  action="/changeUserPassword?id=<%=user.id%>"
+                  method="post"
+                  id="newPasswordUser<%=user.id%>"
+                >
+                  <div class="row g-3 p-2 align-items-center">
+                    <div class="col-auto">
+                      <label
+                        for="newPasswordUser<%=user.id%>"
+                        class="col-form-label"
+                        >New Password</label
+                      >
+                    </div>
+                    <div class="col-auto">
+                      <input
+                        type="password"
+                        name="newPassword"
+                        id="newPasswordUser<%=user.id%>"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  form="newPasswordUser<%=user.id%>"
+                  class="btn btn-primary"
+                >
+                  Save changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHANGE USER TYPE TAB -->
+        <div
+          class="modal fade"
+          id="change-type-user-<%= user.id %>-modal"
+          tabindex="-1"
+          aria-labelledby="change-type-user-<%= user.id %>-modal"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5
+                  class="modal-title"
+                  id="change-password-user-<%= user.id %>-modal"
+                >
+                  Change User Type
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <label class="p-2 fs-5">Username: <%= user.username %></label
+                ><br />
+                <label class="p-2 fs-5"
+                  >Old user type: <%= user.user_type %></label
+                >
+                <hr />
+
+                <!-- NEW PASSWORD FORM -->
+                <form
+                  action="/changeUserType?id=<%=user.id%>&oldUserType=<%=user.user_type%>"
+                  method="post"
+                  id="newTypeUser<%=user.id%>"
+                >
+                  <select
+                    class="form-select my-2"
+                    name="newUserType"
+                    style="width: auto"
+                  >
+                    <option selected value="ADMIN">Admin</option>
+                    <option value="Editor">Editor</option>
+                    <option value="Cashier">Cashier</option>
+                  </select>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  form="newTypeUser<%=user.id%>"
+                  class="btn btn-primary"
+                >
+                  Save changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <td style="border: none">
+          <button
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#addUserModal"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </td>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ADD USER TAB -->
+  <div
+    class="modal fade"
+    id="addUserModal"
+    tabindex="-1"
+    aria-labelledby="addUserModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addUserModalLabel">Add User</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <form action="/addUser" id="addUserForm" method="post">
+            <div class="mb-4">
+              <label class="form-label" for="addUserUsername">Username</label>
+              <input
+                autofocus
+                type="username"
+                id="addUserUsername"
+                class="form-control"
+                name="username"
+              />
+            </div>
+
+            <div class="form-outline mb-4">
+              <label class="form-label" for="addUserPassword">Password</label>
+              <input
+                type="password"
+                id="addUserPassword"
+                class="form-control"
+                name="password"
+              />
+            </div>
+
+            <select
+              class="form-select my-2"
+              name="userType"
+              style="width: auto"
+            >
+              <option selected value="ADMIN">Admin</option>
+              <option value="Editor">Editor</option>
+              <option value="Cashier">Cashier</option>
+            </select>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            form="addUserForm"
+            class="btn btn-success"
+            data-bs-dismiss="modal"
+          >
+            Add User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer"); %>

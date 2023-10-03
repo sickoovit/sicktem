@@ -1,0 +1,242 @@
+<%- include("partials/header"); %>
+<div class="main px-5">
+  <!-- PRODUCTS TABLE -->
+  <div class="h-100 overflow-auto">
+    <div class="tab-content" id="pills-tabContent">
+      <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span>Product Name</span>
+              </th>
+              <th scope="col">
+                <span>Price</span>
+              </th>
+              <th scope="col">
+                <span>Quantity</span>
+              </th>
+              <th style="text-align: end" scope="col">
+                <span>Edit</span>
+              </th>
+            </tr>
+          </thead>
+          <thead>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: end;">
+              <button
+                style="width: 4rem;"
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#addProductCafeModal"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </td>
+          </thead>
+          <tbody>
+            <% products.forEach((product) => { %>
+              <% if (product.category == 'cafe'){%>
+              <tr>
+                <td>
+                  <span><%= product.name %></span>
+                </td>
+                <td>
+                  <span><%= product.price %></span>
+                </td>
+                <td>
+                  <span><%= product.quantity %></span>
+                </td>
+                <th style="text-align: end">
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-primary dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <i class="fa-solid fa-user-gear"></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a
+                        type="button"
+                        class="dropdown-item"
+                        href="/deleteProduct?productId=<%= product._id %>"
+                        >Delete Product</a
+                      >
+                    </div>
+                  </div>
+                </th>
+              </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span>Product Name</span>
+              </th>
+              <th scope="col">
+                <span>Price</span>
+              </th>
+              <th style="text-align: end" scope="col">
+                <span>Edit</span>
+              </th>
+            </tr>
+          </thead>
+          <thead>
+            <td></td>
+            <td></td>
+            <td style="text-align: end;">
+              <button
+                style="width: 4rem;"
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#addProductDeviceModal"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </td>
+          </thead>
+          <tbody>
+            <% products.forEach((product) => { %>
+              <% if (product.category == 'devices'){%>
+              <tr>
+                <td>
+                  <span><%= product.name %></span>
+                </td>
+                <td>
+                  <span><%= product.price %></span>
+                </td>
+                <th style="text-align: end">
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-primary dropdown-toggle"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <i class="fa-solid fa-user-gear"></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a
+                        type="button"
+                        class="dropdown-item"
+                        href="/deleteProduct?productId=<%= product._id %>"
+                        >Delete Product</a
+                      >
+                    </div>
+                  </div>
+                </th>
+              </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-pills mb-3 row row-cols-2" id="pills-tab" role="tablist">
+    <li class="nav-item col px-0" role="presentation">
+      <button class="nav-link custom-nav-link w-100 active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Cafe</button>
+    </li>
+    <li class="nav-item col px-0" role="presentation">
+      <button class="nav-link custom-nav-link w-100" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Devices</button>
+    </li>
+  </ul>
+
+  <!-- ADD PRODUCT TAB -->
+  <div
+    class="modal fade"
+    id="addProductCafeModal"
+    tabindex="-1"
+    aria-labelledby="addProductModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addProductModalLabel">Add Product</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <form action="/addProduct" id="addProductForm" method="post">
+            <div class="mb-4">
+              <label class="form-label" for="addProductName">Product Name</label>
+              <input
+                autofocus
+                type="name"
+                id="addProductName"
+                class="form-control"
+                name="productName"
+                list="devicesOptions"
+                autocomplete="off"
+                required
+              />
+              <datalist id="devicesOptions">
+                <% devicesTypes.forEach(deviceType => { %>
+                  <option><%= deviceType %> Single</option>
+                  <option><%= deviceType %> Multi</option>
+                <% }) %>
+              </datalist>
+            </div>
+
+            <div class="form-outline mb-4">
+              <label class="form-label" for="addProductPrice">Product Price</label>
+              <input
+                type="number"
+                min="1"
+                step="any"
+                id="addProductPrice"
+                class="form-control"
+                name="productPrice"
+                required
+              />
+            </div>
+            <div class="form-outline mb-4">
+              <label class="form-label" for="selectProductCategory">Product Category</label>
+              <select
+                id="selectProductCategory"
+                class="form-select"
+                name="productCategory"
+                required
+              >
+                <option value="cafe">Cafe</option>
+                <option value="devices">Devices</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            form="addProductForm"
+            class="btn btn-success"
+          >
+            Add Product
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include("partials/footer"); %>

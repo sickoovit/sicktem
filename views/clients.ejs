@@ -1,0 +1,148 @@
+<%- include("partials/header"); %>
+
+<div class="main d-flex flex-column justify-content-center px-5">
+  <% if ( alertMsg ) { %>
+  <div
+    class="alert alert-danger rounded mb-4 p-2"
+    style="width: auto"
+    role="alert"
+  >
+    <%=alertMsg%>
+  </div>
+  <% } %>
+  <!-- CLIENTS TABLE -->
+  <div class="h-100 overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span>Client Name</span>
+          </th>
+          <th scope="col">
+            <span>Phone Number</span>
+          </th>
+          <th style="text-align: end" scope="col">
+            <span>Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% clients.forEach((client) => { %>
+        <tr>
+          <td>
+            <span><%= client.name %></span>
+          </td>
+          <td>
+            <span><%= client.phoneNumber %></span>
+          </td>
+          <th style="text-align: end">
+            <div class="dropdown">
+              <button
+                class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fa-solid fa-user-gear"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a
+                  type="button"
+                  class="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#change-info-client-<%= client._id %>-modal"
+                  >Change Client Info</a
+                >
+                <a
+                  type="button"
+                  class="dropdown-item"
+                  href="/deleteClient?clientId=<%= client._id %>"
+                  >Delete Client</a
+                >
+              </div>
+            </div>
+          </th>
+        </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <td style="border: none">
+          <button
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#addClientModal"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </td>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ADD CLIENT TAB -->
+  <div
+    class="modal fade"
+    id="addClientModal"
+    tabindex="-1"
+    aria-labelledby="addClientModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addClientModalLabel">Add Client</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <form action="/addClient" id="addClientForm" method="post">
+            <div class="mb-4">
+              <label class="form-label" for="addClientName">Client Name</label>
+              <input
+                autofocus
+                type="name"
+                id="addClientName"
+                class="form-control"
+                name="clientName"
+                required
+              />
+            </div>
+
+            <div class="form-outline mb-4">
+              <label class="form-label" for="addClientPhoneNumber">Phone Number</label>
+              <input
+                type="text"
+                id="addClientPhoneNumber"
+                class="form-control"
+                name="clientPhoneNumber"
+                required
+              />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            form="addClientForm"
+            class="btn btn-success"
+          >
+            Add Client
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer"); %>

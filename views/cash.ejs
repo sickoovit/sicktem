@@ -1,0 +1,94 @@
+<%- include("partials/header"); %>
+<div class="main px-5">
+  <% if ( alertMsg ) { %>
+    <div
+      class="alert alert-danger rounded mb-4 p-2"
+      style="width: auto"
+      role="alert"
+    >
+      <%=alertMsg%>
+    </div>
+  <% } %>
+  <!-- RECEIPTS CARD DECK -->
+  <div class="row row-cols-5 g-2 h-100 overflow-auto">
+    <% receipts.forEach(receipt => { %>
+      <div class="col">
+        <div class="card card-normal text-center h-100">
+          <div class="card-body">
+            <h4 class="py-2"><%= receipt.client.name %></h4>
+            <table class="table table-borderd">
+              <thead>
+                <th>Quantity</th>
+                <th>Product</th>
+              </thead>
+              <tbody>
+                <% const { products } = receipt; %>
+                <% products.forEach(product => { %>
+                <tr>
+                    <td><%= product.quantity %></td>
+                    <td><%= product.product.name %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+              <tfoot>
+                <% if (receipt.discount) { %>
+                <tr>
+                  <th>Before</th>
+                  <td><%= receipt.total %> L.E</td>
+                </tr>
+                <tr>
+                  <th>Discount</th>
+                  <td>(-<%= receipt.discount %>)</td>
+                </tr>
+                <tr>
+                  <th>After</th>
+                  <td><%= receipt.total - receipt.discount%> L.E</td>
+                </tr>
+                <% }else{ %>
+                  <tr>
+                    <th>Total</th>
+                    <td><%= receipt.total %> L.E</td>
+                  </tr>
+                <% } %>
+              </tfoot>
+            </table>
+          </div>
+          <div class="card-footer" style="background-color: transparent; border-top: none; padding: 0;">
+            <a href="payReceipt?id=<%= receipt._id %>" class="my-3 mx-1 btn btn-dark text-danger">Pay Receipt</a>
+            <a class="my-3 mx-1 btn btn-dark text-warning" data-bs-toggle="modal" data-bs-target="#discountModal<%=receipt.id%>">
+              Apply Discount
+            </a>
+            <div class="modal fade" id="discountModal<%=receipt.id%>" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content card-normal">
+                  <div class="modal-header">
+                      <h5 class="modal-title">Discount For <%= receipt.client.name %></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                   
+                  </div>
+                  <div class="modal-body">
+                    <form id="discountForm<%=receipt.id%>" action="/applyDiscount?receiptId=<%=receipt.id%>" method="post">
+                      <div class="row">
+                        <div class="col-sm-3"></div>
+                        <label class="col-sm-2 col-form-label">Amount</label>
+                        <div class="col-sm-4">
+                          <input class="form-control" name="discount" type="number" min="0" required>
+                        </div>
+                        <div class="col-sm-3"></div>
+                      </div>
+                      <div class="text-center pt-2"> Hint: To Clear Discount Type 0 </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="discountForm<%=receipt.id%>" class="btn btn-dark text-warning">Apply Discount</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<%- include("partials/footer"); %>

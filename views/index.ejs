@@ -1,0 +1,729 @@
+<% function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+} %>
+
+<%- include("partials/header"); %>
+<!-- NAVS AND TABS -->
+<div class="main mx-0">
+  <% if ( alertMsg ) { %>
+    <div
+      class="alert alert-danger rounded m-5 mb-4 p-2 text-center"
+      style="width: auto"
+      role="alert"
+    >
+      <%=alertMsg%>
+    </div>
+  <% } %>
+  <div class="row h-100">
+    <div class="col-sm-9 h-100">
+    <!-- TABS -->
+    <div class="tab-content h-100 py-2 overflow-auto <% if (!shift.length) { %>d-flex align-items-center justify-content-center<% } %>" id="pills-tabContent">
+      <% if (shift.length) { %>
+        <% for( let index = 0; index < devicesTypes.length; index++ ) { %>
+          <% let type = devicesTypes[index] %>
+          <% let cleanType = type.replace(/\s+/g, '-').toLowerCase(); %>
+          <!-- DEVICES TABS -->
+          <div
+            class="tab-pane fade <% if(index == 0 ){ %> show active <% } %> card-container"
+            id="pills-<%= cleanType %>"
+            role="tabpanel"
+            aria-labelledby="pills-<%= cleanType %>-tab"
+          >
+            <div class="row row-cols-1 row-cols-md-3 g-2">
+              <% for( let index = 0; index < devices[type].length; index++ ) {%>
+              <% const device = devices[type][index]; %>
+              <% const {reservation} = device;%>
+              <% const deviceStatus = devices[type][index].deviceStatus;%>
+              <% const state = devices[type][index].state; %>
+              <div class="col">
+                <div class="card card-<%=deviceStatus%>">
+                  <div class="card-body">
+                    <p
+                      class="card-text card-text-<%=deviceStatus%> card-text-<%=state%>"
+                    >
+                      <%=index + 1%>
+                    </p>
+                  </div>
+                  <button
+                    class="rounded status-bar status-bar-<%=deviceStatus%> status-bar-<%=state%>"
+                  ></button>
+                  <a
+                    href="#"
+                    class="stretched-link"
+                    data-bs-toggle="modal"
+                    data-bs-target="#<%=device._id%>"
+                  ></a>
+                  <% if (state == 'idle') { %>
+                    <!-- ADD RESERVATION TAB -->
+                    <div
+                    class="modal fade"
+                    id="<%=device._id%>"
+                    tabindex="-1"
+                    aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5"><%= type %> #<%= index + 1 %></h1>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body p-4">
+                            <!-- ADD RESERVATION FORM -->
+                            <form action="/addReservation" id="addReservationForm-<%=device._id%>" method="post">                    
+                                <!-- INPUT CLIENT NAME -->
+                                <div class="mb-4">
+                                  <label class="form-label" for="addReservationClientName-<%=device._id%>">Client Name</label>
+                                  <input
+                                    id="addReservationClientName-<%=device._id%>"
+                                    class="form-control"
+                                    list="clientNameOptions-<%=device._id%>" 
+                                    for="addReservationPhoneNumber-<%=device._id%>"
+                                    placeholder="Add Or Search..."
+                                    name="clientName"
+                                    autocomplete="off"
+                                    required
+                                  >
+                                  <datalist id="clientNameOptions-<%=device._id%>">
+                                    <% clients.forEach(client => { %>
+                                    <option data-client="<%= JSON.stringify(client) %>" value="<%=client.name%>"><%=client.phoneNumber%></option>
+                                    <% }) %>
+                                  </datalist>
+                                </div>
+                                <!-- INPUT CLIENT PHONE NUMBER -->
+                                <div class="mb-4">
+                                  <label class="form-label" for="addReservationPhoneNumber-<%=device._id%>">Phone Number</label>
+                                  <input
+                                    id="addReservationPhoneNumber-<%=device._id%>"
+                                    class="form-control"
+                                    list="clientPhoneNumberOptions-<%=device._id%>"
+                                    placeholder="Add Or Search..."
+                                    name="clientPhoneNumber" 
+                                    autocomplete="off"
+                                    maxlength="13"
+                                    required
+                                  />
+                                  <datalist id="clientPhoneNumberOptions-<%=device._id%>">
+                                    <% clients.forEach(client => { %>
+                                    <option value="<%=client.phoneNumber%>"><%=client.name%></option>
+                                    <% }) %>
+                                  </datalist>
+                                </div>
+                                <hr class="hr"/>
+                                <!-- SINGLE || MULTI -->
+                                <div class="mb-4">
+                                  <label class="form-label" for="singleOrMultiSelect">Single || Multi</label>
+                                    <select
+                                      class="form-select mb-2"
+                                      id="singleOrMultiSelect"
+                                      name="singleOrMulti"
+                                    >
+                                    <option selected value="Single">Single</option>
+                                    <option value="Multi">Multi</option>
+                                    </select>
+                                </div> 
+                                <hr class="hr"/>
+                                <!-- SET HOURS -->
+                                <div class="mb-4">
+                                  <!-- HOURS SET SWITCH -->
+                                  <div class="d-inline-flex">              
+                                    <label 
+                                      class="form-check-label"  
+                                      for="hoursSwitch"
+                                      >Hours</label
+                                    >
+                                    <div class="form-check form-switch mx-2">
+                                      <input
+                                        checked
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="hoursSwitch"
+                                        onclick="hideInput('inputHours<%=device._id%>')"
+                                      />
+                                      <label
+                                        class="form-check-label"
+                                        for="hoursSwitch"
+                                        >Open</label
+                                      >
+                                    </div>
+                                  </div>
+                                  <!-- HOURS SET INPUT -->
+                                  <input
+                                    class="form-control my-2 invisible"
+                                    type="number"
+                                    min="0"
+                                    placeholder="Number of hours"
+                                    id="inputHours<%=device._id%>"
+                                    name="reservationDuration"
+                                    value='0'
+                                  />
+                                </div>
+                                <div class="form-group d-none">
+                                  <!-- SELECT DEVICE TYPE -->
+                                  <div class="mb-4">
+                                    <label class="form-label" for="selectDeviceType">Device Type</label>
+                                    <select 
+                                      class="form-select mb-2" 
+                                      name="deviceType"
+                                      id="selectDeviceType"
+                                    >
+                                      <option value="<%=cleanType%>" selected><%= type %></option>
+                                    </select>
+                                  </div>
+                                  <!-- SELECT DEVICE ID -->
+                                  <div class="mb-4">
+                                    <label class="form-label" for="selectDeviceId">Device ID</label>
+                                    <select 
+                                      class="form-select mb-2"
+                                      name="deviceId"
+                                      id="selectDeviceId"
+                                    >
+                                      <optgroup id="<%=cleanType%>" label="<%=type%>">
+                                        <option data-device="<%= JSON.stringify(device) %>" value="<%= index %>" selected><%= index + 1 %></option>                                  
+                                      </optgroup>
+                                    </select>
+                                  </div>
+                                </div>
+                              </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="submit"
+                              form="addReservationForm-<%=device._id%>"
+                              class="btn btn-success"
+                            >
+                              Add Reservation
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% }else{ %>
+                    <div
+                    class="modal fade"
+                    id="<%=device._id%>"
+                    tabindex="-1"
+                    aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5"><%= type %> #<%= index + 1 %></h1>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body p-4">
+                            <form 
+                            id="endTimeForm-<%=device._id%>"
+                            action="/endTime"
+                            method="get"
+                            >
+                              <input class="d-none" type="text" name="reservationId" value="<%= reservation._id %>">
+                            </form>
+                            <p class="fs-4">Client Name: <%= reservation.client.name %></p>
+                            <p class="fs-4">End Time:
+                              <% if (reservation.endTime.getTime() == reservation.startTime.getTime()) { %>
+                                Open
+                              <% }else{ %>
+                                <%= formatAMPM(reservation.endTime) %>
+                              <% } %>
+                            </p>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="submit"
+                              form="endTimeForm-<%=device._id%>"
+                              class="btn btn-danger"
+                            >
+                              End Time
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+              <% } %>
+            </div>
+          </div>
+          <% } %>
+          <!-- CAFE TAB -->
+          <div
+            class="tab-pane fade card-container"
+            id="pills-cafe"
+            role="tabpanel"
+            aria-labelledby="pills-cafe-tab"
+          >
+            <div class="row row-cols-1 row-cols-md-3 g-2">
+              <% products.forEach(product => { %>
+                <% if(product.category == 'devices'){return;} %>
+                <div class="col">
+                  <div class="card card-normal">
+                    <div class="card-body">
+                      <p class="card-text display-1" style="font-size: 4vw">
+                        <%= product.name %>
+                      </p>
+                    </div>
+                    <a 
+                    href="#" 
+                    class="stretched-link" 
+                    data-bs-toggle="modal"
+                    data-bs-target="#<%=product._id%>"
+                    ></a>
+                    <!-- ADD PRODUCT TAB -->
+                    <div
+                    class="modal fade"
+                    id="<%=product._id%>"
+                    tabindex="-1"
+                    aria-hidden="true"
+                    >
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5"><%= product.name %></h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body p-4">
+                          <form action="/orderProduct" id="orderProductForm-<%= product._id %>" method="post">
+                              <input
+                                autofocus
+                                type="name"
+                                class="d-none"
+                                id="orderProductId"
+                                name="productId"
+                                value="<%= product._id %>"
+                                required
+                              />
+    
+                            <!-- INPUT CLIENT NAME -->
+                            <div class="mb-4">
+                              <label class="form-label" for="orderClientName-<%=product._id%>">Client Name</label>
+                              <input
+                                id="orderClientName-<%=product._id%>"
+                                class="form-control"
+                                list="clientNameOptions-<%=product._id%>" 
+                                for="orderClientPhoneNumber-<%=product._id%>"
+                                placeholder="Add Or Search..."
+                                name="clientName"
+                                autocomplete="off"
+                                required
+                              >
+                              <datalist id="clientNameOptions-<%=product._id%>">
+                                <% clients.forEach(client => { %>
+                                <option data-client="<%= JSON.stringify(client) %>" value="<%=client.name%>"><%=client.phoneNumber%></option>
+                                <% }) %>
+                              </datalist>
+                            </div>
+                            <!-- INPUT CLIENT PHONE NUMBER -->
+                            <div class="mb-4">
+                              <label class="form-label" for="orderClientPhoneNumber-<%=product._id%>">Phone Number</label>
+                              <input
+                                id="orderClientPhoneNumber-<%=product._id%>"
+                                class="form-control"
+                                list="clientPhoneNumberOptions-<%=product._id%>"
+                                placeholder="Add Or Search..."
+                                name="clientPhoneNumber" 
+                                autocomplete="off"
+                                maxlength="13"
+                                required
+                              />
+                              <datalist id="clientPhoneNumberOptions-<%=product._id%>">
+                                <% clients.forEach(client => { %>
+                                <option value="<%=client.phoneNumber%>"><%=client.name%></option>
+                                <% }) %>
+                              </datalist>
+                            </div>
+    
+                            <div class="form-outline mb-4">
+                              <label class="form-label" for="orderProductQuantity">Product Quantity</label>
+                              <input
+                                type="number"
+                                min="1"
+                                class="form-control"
+                                id="orderProductQuantity"
+                                name="productQuantity"
+                                required
+                              >
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Close
+                          </button>
+                          <button
+                            type="submit"
+                            form="orderProductForm-<%= product._id %>"
+                            class="btn btn-success"
+                          >
+                            Order Product
+                          </button>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+      <% }else{ %>
+        <a class="btn btn-lg btn-success" href="/newShift">New Shift</a>
+      <% } %>
+      
+    </div>
+
+    <!-- NAVS -->
+    <div class="container-fluid fixed-bottom p-0">
+      <div class="col-12 col-md-9 d-flex justify-content-center bg-dark">
+        <ul class="nav nav-pills w-100" id="pills-tab" role="tablist">
+          <div class="row row-cols-<%=devicesTypes.length + 1%> g-0 w-100">
+            <% for( let index = 0; index < devicesTypes.length; index++ ) { %>
+            <% let type = devicesTypes[index]; %>
+            <% let cleanType = type.replace(/\s+/g, '-').toLowerCase(); %>
+            <div class="col">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link <% if(index == 0 ){ %> active <% } %> custom-nav-link w-100"
+                  id="pills-<%= cleanType %>-tab"
+                  data-bs-toggle="pill"
+                  data-bs-target="#pills-<%= cleanType %>"
+                  type="button"
+                  role="tab"
+                  aria-controls="pills-<%= cleanType %>"
+                  aria-selected="true"
+                >
+                  <%= type %>
+                </button>
+              </li>
+            </div>
+            <% } %>
+
+            <!-- CAFE NAV -->
+            <div class="col">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link custom-nav-link w-100"
+                  id="pills-cafe-tab"
+                  data-bs-toggle="pill"
+                  data-bs-target="#pills-cafe"
+                  type="button"
+                  role="tab"
+                  aria-controls="pills-cafe"
+                  aria-selected="false"
+                >
+                  Cafe
+                </button>
+              </li>
+            </div>
+          </div>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="col-sm-3 h-100 py-2 overflow-auto">
+      <% if (shift.length) { %>
+      <div class="card card-normal p-2">
+        <div class="card-body">
+          <div class="row">
+            <h4 class="col">Shift Info</h4>
+            <span id="time" class="col text-end fs-6"> Time </span>
+          </div>
+          <div class="row">
+            <h4 class="col">Cash</h4>
+            <span id="cash" class="col text-end fs-6"> 
+              <%=shiftCash%>
+            </span>
+          </div>
+          <div class="row">
+            <span class="fs-5 col"><%=shift[0].username%></span>
+            <a class="col btn btn-danger" href="/endShift?shiftId=<%=shift[0]._id%>">End Shift</a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+      <% if(runningReservations.length){ %>
+        <h3 class="py-2 text-center">Running Reservations</h3>
+        <div class="row row-cols-1 g-2 mb-3">
+          <% runningReservations.forEach(reservation => { %>
+          <div class="col">
+            <div class="card card-normal text-center">
+              <div class="card-body">
+                <p class="fs-5" style="margin-bottom:0;">
+                  <%= reservation.device.deviceType %> #<%= reservation.deviceName %> 
+                  <%= formatAMPM(reservation.startTime) %>
+                  - 
+                  <% if (reservation.endTime.getTime() == reservation.startTime.getTime()) { %>
+                    Open
+                  <% }else{ %>
+                    <%= formatAMPM(reservation.endTime) %>
+                  <% } %>
+                </p>
+              </div>
+            </div>
+          </div>
+          <% }) %>  
+        </div>
+    <% } %>
+    <% if(upComingReservations.length){ %>
+      <h3 class="py-2 text-center">Upcoming Reservations</h3>
+      <div class="row row-cols-1 g-2 mb-3">
+        <% upComingReservations.forEach(reservation => { %>
+          <div class="col">
+            <div class="card card-normal text-center">
+              <div class="card-body dropdown">
+                <p class="fs-5" style="margin-bottom:0;">
+                  <%= reservation.device.deviceType %> #<%= reservation.deviceName %> 
+                  <%= formatAMPM(reservation.startTime) %>
+                  - 
+                  <% if (reservation.endTime.getTime() == reservation.startTime.getTime()) { %>
+                    Open
+                  <% }else{ %>
+                    <%= formatAMPM(reservation.endTime) %>
+                  <% } %>
+                </p>
+                <a
+                  href="#"
+                  class="stretched-link"
+                  data-bs-toggle="dropdown"
+                >
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a
+                    type="button"
+                    class="dropdown-item"
+                    href="/deleteReservation?reservationId=<%= reservation._id %>"
+                    >Delete Reservation</a
+                  >
+                </div>
+            </div>
+          </div>
+        </div>
+        <% }) %>  
+      </div>
+    <% } %>
+    <% if(receipts.length){ %>
+      <h3 class="py-2 text-center">Open Accounts</h3>
+      <div class="row row-cols-1 g-2 mb-3">
+        <% receipts.forEach(receipt => { %>
+          <% if (receipt.paid) { %>
+           <% return %>
+          <% } %>
+          <div class="col">
+            <div class="card card-normal text-center">
+              <div class="card-body">
+                <p class="fs-5" style="margin-bottom:0;">
+                  <%= receipt.client.name %> -
+                  Amount:
+                  <%= receipt.total %>
+                  <% if (receipt.discount) { %>
+                    => <%= receipt.total - receipt.discount %>
+                  <% } %>
+                  L.E
+                </p>
+              </div>
+            </div>
+          </div>
+        <% }) %>  
+      </div>
+    <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/jquery.redirect.js"></script>
+
+<script>
+  $("*[id*=addReservationClientName]").on('input', function () {
+    const val = this.value;
+    const option = $(`#${$(this).attr('list')} option`).filter(function(){
+        
+        return this.value.toUpperCase() === val.toUpperCase();        
+    });
+    if(option.length){
+      const client = JSON.parse(option.attr("data-client"));
+      $(`#${$(this).attr('for')}`).val(client.phoneNumber);
+      $(`#${$(this).attr('for')}`).prop( "disabled", true );
+    }else{
+      $(`#${$(this).attr('for')}`).val("")
+      $(`#${$(this).attr('for')}`).prop( "disabled", false );
+    }
+  });
+
+  $("*[id*=orderClientName]").on('input', function () {
+    const val = this.value;
+    const option = $(`#${$(this).attr('list')} option`).filter(function(){
+        
+        return this.value.toUpperCase() === val.toUpperCase();        
+    });
+    if(option.length){
+      const client = JSON.parse(option.attr("data-client"));
+      $(`#${$(this).attr('for')}`).val(client.phoneNumber);
+      $(`#${$(this).attr('for')}`).prop( "disabled", true );
+    }else{
+      $(`#${$(this).attr('for')}`).val("")
+      $(`#${$(this).attr('for')}`).prop( "disabled", false );
+    }
+  });
+
+  $("*[id*=addReservationForm]").submit(function( event ) {
+    event.preventDefault();
+    var url = $(this).attr( "action" );
+    var arrPostData = $(this).serializeArray();
+    var objPostData = {};
+    arrPostData.forEach(pieceOfData => {
+      objPostData[pieceOfData.name] = pieceOfData.value;
+    });
+
+    const firstValue = $(`#${$(this).attr('id')} *[id*=addReservationClientName]`).val();
+    const nameOption = $(`#${$(this).attr('id')} *[id*=clientNameOptions] option`).filter(function(){
+        const val = this.value;
+        
+        return firstValue.toUpperCase() === val.toUpperCase();        
+    });
+    var client;
+    if(nameOption.length){
+      client = nameOption.attr("data-client");
+    }else{
+      client = null;
+    }
+
+    const deviceOption = $(`#${$(this).attr('id')} optgroup#${objPostData['deviceType'].replace(/\s+/g, '-').toLowerCase()} option`).filter(function(){
+        const val = this.value;
+        return objPostData['deviceId'] == val;        
+    });
+    var device;
+    if(deviceOption.length){
+      device = deviceOption.attr("data-device");
+    }else{
+      device = null;
+    }
+    
+    objPostData.clientObj = client;
+    objPostData.deviceObj = device;
+    $.redirect(url, objPostData, "POST");
+  });
+
+  $("*[id*=orderProductForm]").submit(function( event ) {
+    event.preventDefault();
+    var url = $(this).attr( "action" );
+    var arrPostData = $(this).serializeArray();
+    var objPostData = {};
+    arrPostData.forEach(pieceOfData => {
+      objPostData[pieceOfData.name] = pieceOfData.value;
+    });
+
+    const firstValue = $(`#${$(this).attr('id')} *[id*=orderClientName]`).val();
+    const nameOption = $(`#${$(this).attr('id')} *[id*=clientNameOptions] option`).filter(function(){
+        const val = this.value;
+        
+        return firstValue.toUpperCase() === val.toUpperCase();        
+    });
+    var client;
+    if(nameOption.length){
+      client = nameOption.attr("data-client");
+    }else{
+      client = null;
+    }
+
+    objPostData.clientJson = client;
+    $.redirect(url, objPostData, "POST");
+  });
+
+  function hideInput(inputToHide) {
+    var inputField = $(`#${inputToHide}`);
+    inputField.toggleClass('invisible');
+  }
+
+</script>
+
+<% var runningReservationsNotOpen = JSON.stringify(runningReservations.filter((r)=> {return r.endTime.getTime() != r.startTime.getTime()})) %>
+<% var upComingReservationsString = JSON.stringify(upComingReservations); %>
+
+<script type="text/javascript">
+
+  var upComingReservationsArray = <%-upComingReservationsString%>;
+  if(upComingReservationsArray){
+    upComingReservationsArray.forEach((reservation) => {
+      var now = new Date();
+      setTimeout(function(){
+        location.reload();
+      }, (new Date(reservation.startTime)).getTime() - now.getTime());
+    })
+  } 
+
+  var endingLaterReservations = <%-runningReservationsNotOpen%>;
+  if(endingLaterReservations){
+    endingLaterReservations.forEach((reservation) => {
+      var now = new Date();
+
+      setTimeout(function(){
+        alert(`5 MINUTES LEFT FOR DEVICE: ${reservation.device.deviceType} #${reservation.deviceName}`)
+      }, (new Date(reservation.endTime)).getTime() - now.getTime() - (5 * 60 * 1000));
+
+      setTimeout(function(){
+        location.reload();
+      }, (new Date(reservation.endTime)).getTime() - now.getTime());
+    })
+  }
+
+  function updateClock() {
+    var now = new Date(), // current date
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"],
+        time = now.getHours() + ':' + ((now.getMinutes() < 10) ? '0' + now.getMinutes(): now.getMinutes()),
+
+        // a cleaner way than string concatenation
+        date = [now.getDate(), 
+                months[now.getMonth()],
+                now.getFullYear()].join(' ');
+
+    // set the content of the element with the ID time to the formatted string
+    document.getElementById('time').innerHTML = [date, time].join(' / ');
+
+    // call this function again in 1000ms
+    setTimeout(updateClock, 1000);
+  }
+  updateClock();
+</script>
+<%- include("partials/footer"); %>

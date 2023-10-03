@@ -1,0 +1,38 @@
+.gradient-custom {
+    /* fallback for old browsers */
+    background: #e70909;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(
+        to right,
+        rgb(215, 35, 35),
+        rgba(62, 54, 54, 1)
+    );
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(
+        to right,
+        rgba(215, 35, 35, 1),
+        rgba(62, 54, 54, 1)
+    );
+}
+
+.font-double-size {
+    font-size: 300%;
+}
+
+footer > p {
+    text-align: center;
+}
+
+.bg-card-custom {
+    background-color: #f5eded;
+}
+
+.form-control {
+    border-color: #fff;
+}
+
+.form-control:focus {
+    border-color: #fff;
+}
