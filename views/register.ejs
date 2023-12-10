@@ -19,7 +19,7 @@
         <!-- FAVICON -->
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 
-        <title>See | Login</title>
+        <title>Sick-tem | Register</title>
     </head>
     <body>
         <section class="vh-100 gradient-custom">
@@ -46,7 +46,7 @@
                                         <%=alertMsg%>
                                     </div>
                                     <% } %>
-                                    <form action="/login" method="post">
+                                    <form action="/register" method="post">
                                         <div class="form-outline mb-4">
                                             <input autofocus
                                                 type="username"
@@ -61,34 +61,47 @@
                                             >
                                         </div>
 
-                                        <div class="form-outline mb-6">
+                                        <div class="form-outline mb-4">
                                             <input
                                                 type="password"
-                                                id="typePasswordX"
+                                                id="typePassword"
                                                 class="form-control form-control-lg"
                                                 name="password"
                                             />
                                             <label
                                                 class="form-label"
-                                                for="typePasswordX"
+                                                for="typePassword"
                                                 >Password</label
                                             >
                                         </div>
+                                        <div class="form-outline mb-6">
+                                            <input
+                                                type="password"
+                                                id="typePasswordConfirm"
+                                                class="form-control form-control-lg"
+                                                name="passwordConfirm"
+                                            />
+                                            <label
+                                                class="form-label"
+                                                for="typePasswordConfirm"
+                                                >Confirm Password</label
+                                            >
+                                        </div>
 
-                                        <button
-                                            class="btn btn-outline-dark btn-lg px-5"
-                                            type="submit"
-                                            formaction="/login"
-                                        >
-                                            Login
-                                        </button>
-                                        <p class="text-dark my-3">or</p>
                                         <button
                                             class="btn btn-outline-danger btn-lg px-5"
                                             type="submit"
                                             formaction="/register"
                                         >
                                             Register
+                                        </button>
+                                        <p class="text-dark my-3">or</p>
+                                        <button
+                                            class="btn btn-outline-dark btn-lg px-5"
+                                            type="submit"
+                                            formaction="/login"
+                                        >
+                                            Login
                                         </button>
                                     </form>
                                 </div>

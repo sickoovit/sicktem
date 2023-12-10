@@ -8,7 +8,7 @@ const express = require('express');
 const app = express();
 
 const session = require('express-session');
-const SESS_NAME = 'see_login';
+const SESS_NAME = 'sicktem_login';
 
 app.set('view engine', 'ejs');
 app.use(express.static('app'));
@@ -197,7 +197,7 @@ app.get('/', redirectLogin, (req, res) => {
     });
 
     res.render('index', {
-      title: 'See | Home',
+      title: 'Sicktem | Home',
       localStyles: 'index',
       alertMsg: alertMsg,
       shift: activeShift,
@@ -215,8 +215,20 @@ app.get('/', redirectLogin, (req, res) => {
 });
 
 app.get('/login', redirectHome, (req, res) => {
+  let alertMsg = null;
+  alertMsg = req.query.alertMsg;
+
   res.render('login', {
-    alertMsg: null,
+    alertMsg: alertMsg,
+  });
+});
+
+app.get('/register', redirectHome, (req, res) => {
+  let alertMsg = null;
+  alertMsg = req.query.alertMsg;
+
+  res.render('register', {
+    alertMsg: alertMsg,
   });
 });
 
@@ -232,7 +244,7 @@ app.get('/cash', redirectLogin, (req, res) => {
     });
 
     res.render('cash', {
-      title: 'See | Cash Register',
+      title: 'Sicktem | Cash Register',
       localStyles: 'cash',
       userType: req.session.userType,
       alertMsg: null,
@@ -266,7 +278,7 @@ app.get('/reservations', redirectLogin, (req, res) => {
     });
 
     res.render('reservations', {
-      title: 'See | Reservations',
+      title: 'Sicktem | Reservations',
       localStyles: 'reservations',
       alertMsg: alertMsg,
       devices: devicesFiltered,
@@ -284,7 +296,7 @@ app.get('/clients', redirectLogin, (req, res) => {
   Client.find()
     .then(function (clients) {
       res.render('clients', {
-        title: 'SEE | Clients',
+        title: 'Sicktem | Clients',
         localStyles: 'clients',
         alertMsg: alertMsg,
         clients: clients,
@@ -309,7 +321,7 @@ app.get('/products', redirectLogin, (req, res) => {
     );
 
     res.render('products', {
-      title: 'SEE | Products',
+      title: 'Sicktem | Products',
       localStyles: 'products',
       products: products,
       devicesTypes: devicesTypes,
@@ -324,7 +336,7 @@ app.get('/users', redirectLogin, (req, res) => {
   alertMsg = req.query.alertMsg;
   db.all(sql, (err, rows) => {
     res.render('users', {
-      title: 'See | Users',
+      title: 'Sicktem | Users',
       localStyles: 'users',
       alertMsg: alertMsg,
       users: rows,
@@ -348,7 +360,7 @@ app.get('/devices', redirectLogin, (req, res) => {
     });
 
     res.render('devices', {
-      title: 'SEE | Devices ',
+      title: 'Sicktem | Devices ',
       localStyles: 'devices',
       devices: devicesFiltered,
       devicesTypes: devicesTypes,
@@ -557,6 +569,48 @@ app.post('/login', redirectHome, (req, res) => {
     } else {
       return res.render('login', {
         alertMsg: 'Username or Password Incorrect',
+      });
+    }
+  });
+});
+
+app.post('/register', redirectHome, (req, res) => {
+  const { username, password, passwordConfirm } = req.body;
+
+  const sql = `SELECT * FROM users WHERE username=?`;
+  db.all(sql, [username], (err, rows) => {
+    if (err) {
+      return res.render('register', {
+        alertMsg: 'Some Error Occurred, Please Try Again.',
+      });
+    }
+
+    if (rows.length > 0) {
+      return res.redirect(
+        '/login?alertMsg=' +
+          encodeURIComponent('Username already exists, Login Instead?')
+      );
+    } else if (username == '' || password == '') {
+      return res.render('register', {
+        alertMsg: null,
+      });
+    } else if (password != passwordConfirm) {
+      return res.render('/register', {
+        alertMsg: 'Password do not match!',
+      });
+    } else {
+      const sql = `INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)`;
+      db.run(sql, [username, password, 'Cashier'], (err) => {
+        if (err) {
+          return res.redirect('/register', {
+            alertMsg: 'Some Error Occurred, Please Try Again',
+          });
+        } else {
+          req.session.username = username;
+          req.session.userType = 'Chashier';
+          req.session.userId = db.lastID;
+          return res.redirect('/');
+        }
       });
     }
   });
